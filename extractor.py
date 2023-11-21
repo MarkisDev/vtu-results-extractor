@@ -1,5 +1,3 @@
-from email import header
-from email.mime import base
 import requests
 from bs4 import BeautifulSoup
 import pytesseract
