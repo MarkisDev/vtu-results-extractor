@@ -1,5 +1,4 @@
 import sqlite3
-import _osx_support
 import os
 from datetime import date
 

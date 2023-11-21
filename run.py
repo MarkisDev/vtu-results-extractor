@@ -1,9 +1,7 @@
-from operator import index
 from enums import ExtractorEnums as Const
 from extractor import Extractor
 from file import File
 import os
-from datetime import date
 from db import Database
 import re
 import eel
@@ -16,6 +14,7 @@ db = Database(os.getcwd())
 @eel.expose
 def extract(usns, link, reval):
     try:
+        count = 0
         skipped = []
         link = link.replace('https://', '').replace('http://', '')
         resultCode = link.split('/')[1]
@@ -37,6 +36,10 @@ def extract(usns, link, reval):
                         skipped.append(usn)
                     else:
                         time.sleep(10)
+                        count+=1
+                        if count == 30:
+                            time.sleep(330)
+                            count = 0
             else:
                 skipped.append(usn)
         return {"status": True, "len": len(usnList)-len(skipped), "skipped": skipped}
