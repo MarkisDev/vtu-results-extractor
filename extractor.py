@@ -113,7 +113,7 @@ class Extractor:
                 captchaRegEx = re.compile(r'captcha', re.IGNORECASE)
                 if bool(captchaRegEx.search(error.text)):
                     # Adding a delay of 10 seconds before respamming captcha
-                    time.sleep(5)
+                    time.sleep(15)
                     return self.extract(usn, reval)
                 else:
                     return False
