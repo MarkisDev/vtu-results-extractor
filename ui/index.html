@@ -15,6 +15,7 @@
         eel.expose(queue);
         function queue(usn)
         {
+            document.getElementById("starting").style.display = "none";
             document.getElementById("queue").style.display = "block";
             document.getElementById("queue-usn").textContent = usn.toUpperCase();
         }
@@ -37,8 +38,7 @@
                 <button class="btn btn-1 btn-1e" id="truncate" onclick="truncate()">Clear Data</button>
             </div>
 
-
-
+             <p id="starting" class="starting extract"></p>
             <p id="queue" class="extract">Extracting USN : <span id="queue-usn"></span></p>
 
             <p class="credits">For any issues, contact <span class="email"><a

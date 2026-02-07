@@ -26,6 +26,8 @@ toastr.options = {
 
 function extract()
 {
+    document.getElementById("starting").style.display = "block";
+    document.getElementById("starting").textContent = "Begining with extraction..."
     var resultLink = document.getElementById('link').value;
     var usn = document.getElementById('usn').value;
     var reval = document.getElementById('reval').checked;

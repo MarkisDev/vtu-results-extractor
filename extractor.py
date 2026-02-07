@@ -54,6 +54,7 @@ class Extractor:
                 '[\W_]+', '', pytesseract.image_to_string(pil_img))
             self.captchaCode = captcha_code
         except:
+            print("Error occured while decoding captcha!")
             raise Exception("Error occured while decoding captcha!")
 
     def parseIndexPage(self):
@@ -66,7 +67,8 @@ class Extractor:
             self.img_src = soup.find(alt="CAPTCHA code")['src']
             self.token = soup.find('input')['value']
             self.indexPage = indexPage.text
-        except:
+        except Exception as e:
+            print("Error occured while parsing index page!")
             raise Exception("Error while parsing Index page!")
 
     def parseResultPage(self, usn, reval):
@@ -76,12 +78,13 @@ class Extractor:
         whitespaceRegEx = re.compile(r'\s+')
         try:
             # Making sure the result page is fetched
-            if ((len(resultPage.text) > 500) and (len(self.indexPage) != len(resultPage.text)) and resultPage.ok):
+            if(("nomenclature" in resultPage.text.lower()) and (len(self.indexPage) != len(resultPage.text)) and resultPage.ok):
                 # Adding records to DB after parsing result page
                 tables = soup.find_all(
                     'div', {"class": "col-md-12 table-responsive"})
-                # Fetching Student Details
+                                # Fetching Student Details
                 studentDetails = tables[0].table.find_all('b')
+
                 usn = studentDetails[1].next_sibling.strip()
                 name = studentDetails[3].next_sibling.strip()
 
@@ -105,20 +108,21 @@ class Extractor:
                             " ", val.text.strip()).strip() for val in cells]
                         # Inserting detail into db
                         self.db.insertRecord(
-                            reval, usn, name, sem, *cellData)
+                            reval, usn.lower(), name, sem, *cellData)
+                        
                 return True
             else:
-                # Retry if captcha is wrong else USN is invalid
+                # Retry if captcha is wrong / redirected to main ELSE USN is invalid so ignore
                 error = soup.find_all('script')[0]
                 captchaRegEx = re.compile(r'captcha', re.IGNORECASE)
-                if bool(captchaRegEx.search(error.text)):
+                if (bool(captchaRegEx.search(error.text)) or (len(self.indexPage) == len(resultPage.text))):
                     # Adding a delay of 10 seconds before respamming captcha
                     time.sleep(5)
                     return self.extract(usn, reval)
                 else:
                     return False
         except Exception as e:
-            print("Error occured while parsing result!")
+            print("Error occured while parsing result!", e)
             return False
 
     def extract(self, usn, reval):
@@ -127,5 +131,6 @@ class Extractor:
             self.decodeCaptcha()
             return self.parseResultPage(usn, reval)
         except Exception as e:
+            print("Error occured while extracting!")
             print(e)
             return False
